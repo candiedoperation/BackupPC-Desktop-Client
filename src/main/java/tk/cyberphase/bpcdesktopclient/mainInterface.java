@@ -33,30 +33,12 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 
 public class mainInterface extends javax.swing.JFrame implements callbackInterface {
+
     private bpcConfigParser bpcConfParser;
-    private DefaultTableModel rsyncdConfigDataModel;
+    private DefaultTableModel rsyncdConfModel;
 
     public mainInterface() {
-        try {
-            bpcConfParser = new bpcConfigParser();
-            rsyncdConfigDataModel = readDaemonrsyncConf();
-        } catch (ConfigurationException | IOException ex) {
-            Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        initComponents();
-        this.setLocationRelativeTo(null); //Initialize the Window at Screen Center
-    }
-    
-    @Override
-    public void addedBackupPath() {
-        rsyncdConfigDataModel = readDaemonrsyncConf();
-        rsyncdConfigDataModel.fireTableDataChanged();
-    }
-
-    
-    private DefaultTableModel readDaemonrsyncConf() {
-        DefaultTableModel rsyncdConfModel = new DefaultTableModel(new Object[][]{},
+        rsyncdConfModel = new DefaultTableModel(new Object[][]{},
                 new String[]{
                     "Module Name",
                     "Backup Path",
@@ -77,22 +59,38 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
         };
 
         try {
-            List<iniConfigData> configData = rsyncDaemonConfParser.parseDaemonConfig(bpcConfParser.bpcConfigData.get("rsyncd_conf_path"));
+            bpcConfParser = new bpcConfigParser();
+        } catch (ConfigurationException | IOException ex) {
+            Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        initComponents();
+        this.setLocationRelativeTo(null); //Initialize the Window at Screen Center
+    }
+
+    @Override
+    public void addedBackupPath() {
+        readDaemonrsyncConf();
+    }
+
+    private DefaultTableModel readDaemonrsyncConf() {
+        //Clear Rows
+        try {
+            List<iniConfigData> configData = new rsyncDaemonConfParser().parseDaemonConfig(bpcConfParser.bpcConfigData.get("rsyncd_conf_path"));
             var rowData = new String[10];
             String currentRow = null;
 
             for (iniConfigData dataKey : configData) {
                 if (dataKey.config_header != null) {
-                    
+
                     if (!dataKey.config_header.equals(currentRow) && currentRow != null) {
                         //System.out.println(Arrays.toString(rowData)); //Debugging
-                        System.out.print("POTTY");
                         rsyncdConfModel.addRow(rowData);
                         Arrays.fill(rowData, null);
                     }
-                    
+
                     currentRow = dataKey.config_header;
-                    rowData[0] = dataKey.config_header;                
+                    rowData[0] = dataKey.config_header;
 
                     for (Entry<String, String> configCategory : dataKey.config_settings.entrySet()) {
                         //System.out.println(configCategory.getKey());
@@ -128,12 +126,12 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
                     }
                 }
             }
-            
+
             if (rowData[0] != null) {
                 rsyncdConfModel.addRow(rowData);
                 Arrays.fill(rowData, null);
             }
-            
+
         } catch (FileNotFoundException e) {
             Logger.getLogger(rsyncDaemonConfParser.class.getName()).log(Level.SEVERE, null, e);
         } catch (ConfigurationException | IOException ex) {
@@ -141,7 +139,7 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
         }
 
         return rsyncdConfModel;
-    }    
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

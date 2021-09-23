@@ -31,6 +31,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
  */
 public class rsyncDaemonConfAdd extends javax.swing.JDialog {
     private rsyncDaemonConfParser confParser;
+    private java.awt.Frame currentParentFrame;
     
     public void register(callbackInterface callbackinterface) {
         callbackinterface.addedBackupPath();
@@ -38,6 +39,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
     
     public rsyncDaemonConfAdd(java.awt.Frame parent, boolean modal, String daemonConfLocation) {
         super(parent, modal);
+        currentParentFrame = parent;
         initComponents();
         this.setLocationRelativeTo(null); //Initialize the Window at Screen Center        
         
@@ -110,6 +112,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
         charsetSetting = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         pathComment = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Add a New Backup Location");
@@ -159,6 +162,11 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
 
         backupPath.setText("/cygdrive/");
         backupPath.setToolTipText("<html>Add Backup Path Without Quotes <b>after /cygdrive/</b><br>Example: <b>/cygdrive/c/Documents and Settings</b></html>");
+        backupPath.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                backupPathFocusGained(evt);
+            }
+        });
         backupPath.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 backupPathKeyReleased(evt);
@@ -263,6 +271,13 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
             }
         });
 
+        jButton1.setText("Browse");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -300,9 +315,12 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
                             .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(backupPath)
                             .addComponent(moduleName)
-                            .addComponent(pathComment))))
+                            .addComponent(pathComment)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(backupPath)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(20, 20, 20))
         );
         jPanel1Layout.setVerticalGroup(
@@ -315,7 +333,8 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(backupPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(backupPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
@@ -348,7 +367,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
                     .addComponent(charsetSetting, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addBackupLocation)
                     .addComponent(cancelAddition))
@@ -387,7 +406,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
         configFieldData.put("list", allowListing.getText());
         configFieldData.put("charset", charsetSetting.getText());
 
-        rsyncDaemonConfParser.addConfigHeader(configFieldData);
+        new rsyncDaemonConfParser().addConfigHeader(configFieldData);
         callbackInterface callbackinterface = new mainInterface();
         register(callbackinterface);
         
@@ -468,6 +487,16 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
     private void moduleNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_moduleNameFocusLost
         // TODO add your handling code here:
     }//GEN-LAST:event_moduleNameFocusLost
+
+    private void backupPathFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_backupPathFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_backupPathFocusGained
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        fileChooserDialog folderPathChooser = new fileChooserDialog(currentParentFrame, true);
+        folderPathChooser.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
     
     /**
      * @param args the command line arguments
@@ -525,6 +554,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
     private javax.swing.JTextField backupPath;
     private javax.swing.JButton cancelAddition;
     private javax.swing.JTextField charsetSetting;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;

@@ -52,8 +52,12 @@ public class rsyncDaemonConfParser {
         iniConfig.read(configReader);
         invalidModuleNames = iniConfig.getSections(); //Using getSection() will create the section (if not exists)        
     }
+    
+    public rsyncDaemonConfParser() {
+        
+    }
 
-    public static List<iniConfigData> parseDaemonConfig(String daemonConfPath) throws FileNotFoundException, ConfigurationException, IOException {
+    public List<iniConfigData> parseDaemonConfig(String daemonConfPath) throws FileNotFoundException, ConfigurationException, IOException {
         List<iniConfigData> daemonConfigData = new ArrayList<>();
         INIConfiguration iniConfig = new INIConfiguration();
         BufferedReader configReader = Files.newBufferedReader(Paths.get(daemonConfPath), StandardCharsets.UTF_8);
@@ -85,19 +89,19 @@ public class rsyncDaemonConfParser {
         return daemonConfigData;
     }
     
-    public static void addConfigHeader(Map<String,String> config_data) {
+    public void addConfigHeader(Map<String,String> config_data) {
         System.out.println(config_data.toString());
     }
     
-    public static boolean isSectionNameInvalid(String configHeaderName) throws IOException, ConfigurationException {        
+    public boolean isSectionNameInvalid(String configHeaderName) throws IOException, ConfigurationException {        
         return invalidModuleNames.stream().anyMatch(configHeaderName::equalsIgnoreCase); //INI Header Names are case-insensitive in Windows, Others may behave differently
     }
     
-    public static void removeConfigHeader(String configHeaderName) {
+    public void removeConfigHeader(String configHeaderName) {
         
     }
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
         try {
             List<iniConfigData> data = parseDaemonConfig(new bpcConfigParser().bpcConfigData.get("rsyncd_conf_path"));
             data.forEach(data_field -> {

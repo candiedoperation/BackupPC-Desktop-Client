@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 
 public class bpcConfigParser {
-    public static Map<String, String> bpcConfigData;
+    public Map<String, String> bpcConfigData;
     
     public bpcConfigParser () throws ConfigurationException, IOException {
         bpcConfigData = new HashMap<>();
