@@ -15,19 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package tk.cyberphase.bpcdesktopclient;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-
-public class bpcConfigParser {
-    public static Map<String, String> bpcConfigData;
-    
-    public bpcConfigParser () throws ConfigurationException, IOException {
-        bpcConfigData = new HashMap<>();
-        bpcConfigData.put("rsyncd_conf_path", "/home/atheesh/rsyncd.conf.bak");
-    }
+/**
+ *
+ * @author atheesh
+ */
+public interface callbackInterface {
+    void addedBackupPath();
 }
