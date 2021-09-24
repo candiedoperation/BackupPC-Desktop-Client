@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
@@ -84,16 +83,28 @@ public class rsyncdConfigModel extends AbstractTableModel {
     public void updateConfigModel (bpcConfigParser bpcConfParser) {
         try {
             rowIdentifiers.clear();
-            rowIdentifiers.add(new String[columnIdentifiers.length]);
             
             List<iniConfigData> configData = new rsyncDaemonConfParser().parseDaemonConfig(bpcConfParser.bpcConfigData.get("rsyncd_conf_path"));
             ListIterator configDataIterator = configData.listIterator();
             
             while (configDataIterator.hasNext()) { configDataIterator.next(); }
             
-            for (iniConfigData internalConfigIteratorData : configData) {
-                System.out.println(internalConfigIteratorData.config_header);
-            }
+            configData.forEach(internalConfigIteratorData -> {
+                String[] newConfigRow = new String[columnIdentifiers.length];
+                newConfigRow[0] = internalConfigIteratorData.config_header;
+                newConfigRow[1] = internalConfigIteratorData.config_settings.get("path");
+                newConfigRow[2] = internalConfigIteratorData.config_settings.get("comment");
+                newConfigRow[3] = internalConfigIteratorData.config_settings.get("strict modes");
+                newConfigRow[4] = internalConfigIteratorData.config_settings.get("auth users");
+                newConfigRow[5] = internalConfigIteratorData.config_settings.get("secrets file");
+                newConfigRow[6] = internalConfigIteratorData.config_settings.get("hosts allow");
+                newConfigRow[7] = internalConfigIteratorData.config_settings.get("read only");
+                newConfigRow[8] = internalConfigIteratorData.config_settings.get("list");
+                newConfigRow[9] = internalConfigIteratorData.config_settings.get("charset");                
+                
+                System.out.println(Arrays.toString(newConfigRow));
+                rowIdentifiers.add(newConfigRow);
+            });
             
         } catch (FileNotFoundException e) {
             Logger.getLogger(rsyncDaemonConfParser.class.getName()).log(Level.SEVERE, null, e);

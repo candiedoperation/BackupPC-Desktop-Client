@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
-import javax.swing.table.DefaultTableModel;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 
 public class mainInterface extends javax.swing.JFrame implements callbackInterface {

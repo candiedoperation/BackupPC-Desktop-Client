@@ -105,7 +105,7 @@ public class rsyncDaemonConfParser {
                     if (value != null) {
                         //key = key.replace("..", "."); // TODO: find a better way than this hack
                         parsedConfigField.config_header = sectionName;
-                        parsedConfigField.config_settings.add(new HashMap<String, String>(){{ put(key, value); }});
+                        parsedConfigField.config_settings.put(key, value);
                         daemonConfigData.set(currentIteratorSectionID, parsedConfigField);
                     }
                 }
