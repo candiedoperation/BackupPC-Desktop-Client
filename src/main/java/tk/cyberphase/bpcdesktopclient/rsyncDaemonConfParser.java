@@ -74,24 +74,24 @@ public class rsyncDaemonConfParser {
             SubnodeConfiguration section = iniConfig.getSection(sectionName);
             
             if (sectionName != null && currentIteratorSection == null) {
-                System.out.println("First Non-Global Element of Configuration File: " + currentIteratorSection);
-                
                 parsedConfigField = new iniConfigData();
+                daemonConfigData.add(parsedConfigField);
                 currentIteratorSection = sectionName;
-                //currentIteratorSectionID++;
-            } else if (sectionName == null && currentIteratorSection == null) {
-                System.out.println(String.format("Global Element of the Configuration File: %s", currentIteratorSection));
                 
+                System.out.println("First Non-Global Element of Configuration File: " + currentIteratorSection);
+            } else if (sectionName == null && currentIteratorSection == null) {
                 parsedConfigField = new iniConfigData();
                 daemonConfigData.add(parsedConfigField);
                 currentIteratorSection = null;
-            } else if (!sectionName.equals(currentIteratorSection)) {
-                System.out.println(String.format("Global Element %d of the Configuration File: %s", currentIteratorSectionID, currentIteratorSection));
                 
+                System.out.println(String.format("Global Section of the Configuration File: %s", currentIteratorSection));
+            } else if (!sectionName.equals(currentIteratorSection)) {                
                 parsedConfigField = new iniConfigData();
                 daemonConfigData.add(parsedConfigField);
                 currentIteratorSection = sectionName;
                 currentIteratorSectionID++;
+                
+                System.out.println(String.format("Non-Global Element %d of the Configuration File: %s", (currentIteratorSectionID + 1), currentIteratorSection));  //+1 is for Human Readability. It lists length instead of index.                
             }
             
             if (section != null) {
