@@ -19,6 +19,7 @@
 package tk.cyberphase.bpcdesktopclient;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,13 +30,9 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
  *
  * @author atheesh
  */
-public class rsyncDaemonConfAdd extends javax.swing.JDialog {
+public class rsyncDaemonConfAdd extends javax.swing.JDialog implements callbackInterface  {
     private rsyncDaemonConfParser confParser;
     private java.awt.Frame currentParentFrame;
-    
-    public void register(callbackInterface callbackinterface) {
-        callbackinterface.addedBackupPath();
-    }
     
     public rsyncDaemonConfAdd(java.awt.Frame parent, boolean modal, String daemonConfLocation) {
         super(parent, modal);
@@ -48,37 +45,20 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
         } catch (ConfigurationException | IOException ex) {
             Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }    
+    
+    public void registerAddedPathCallback(callbackInterface callbackinterface) {
+        callbackinterface.addedBackupPath();
     }
     
-    private void validateFields() {
-        if (
-                moduleName.getText().trim().equals("") ||
-                backupPath.getText().trim().equals("") ||
-                pathComment.getText().trim().equals("") ||
-                strictMode.getText().trim().equals("") ||
-                authorizedUsers.getText().trim().equals("") ||
-                secretsFile.getText().trim().equals("") ||
-                allowedHosts.getText().trim().equals("") ||
-                readOnly.getText().trim().equals("") ||
-                allowListing.getText().trim().equals("") ||
-                charsetSetting.getText().trim().equals("")
-        ) {
-            addBackupLocation.setEnabled(false);
-        } else {
-            addBackupLocation.setEnabled(true);
-        }
-        
-        try {
-            if (confParser.isSectionNameInvalid(moduleName.getText()) == true) {
-                addBackupLocation.setEnabled(false);
-                addBackupLocation.setToolTipText("<html><b>Module Name is aldready taken</b> for another Path<br>Try another Name</html>");
-            } else {
-                addBackupLocation.setToolTipText(null);
-            }
-        } catch (IOException | ConfigurationException ex) {
-            Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
-        }        
-    }    
+    @Override
+    public void fileChoosingComplete(String chosenFilePath) {
+        //System.out.println(Paths.get("/cygdrive/", chosenFilePath).toString()); /Debugging
+        updateChosenBackupPath (Paths.get("/cygdrive/", chosenFilePath).toString());
+    }
+    
+    @Override
+    public void addedBackupPath() {} 
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -333,7 +313,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(backupPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(backupPath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -408,7 +388,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
 
         new rsyncDaemonConfParser().addConfigHeader(configFieldData);
         callbackInterface callbackinterface = new mainInterface();
-        register(callbackinterface);
+        registerAddedPathCallback(callbackinterface);
         
         this.dispose();
     }//GEN-LAST:event_addBackupLocationActionPerformed
@@ -494,7 +474,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        fileChooserDialog folderPathChooser = new fileChooserDialog(currentParentFrame, true);
+        fileChooserDialog folderPathChooser = new fileChooserDialog(currentParentFrame, true, this);
         folderPathChooser.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
     
@@ -537,9 +517,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
                         }
                     });
                     dialog.setVisible(true);
-                } catch (ConfigurationException ex) {
-                    Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
+                } catch (ConfigurationException | IOException ex) {
                     Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -572,4 +550,39 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog {
     private javax.swing.JTextField secretsFile;
     private javax.swing.JTextField strictMode;
     // End of variables declaration//GEN-END:variables
+
+    private void validateFields() {
+        if (
+                moduleName.getText().trim().equals("") ||
+                backupPath.getText().trim().equals("") ||
+                pathComment.getText().trim().equals("") ||
+                strictMode.getText().trim().equals("") ||
+                authorizedUsers.getText().trim().equals("") ||
+                secretsFile.getText().trim().equals("") ||
+                allowedHosts.getText().trim().equals("") ||
+                readOnly.getText().trim().equals("") ||
+                allowListing.getText().trim().equals("") ||
+                charsetSetting.getText().trim().equals("")
+        ) {
+            addBackupLocation.setEnabled(false);
+        } else {
+            addBackupLocation.setEnabled(true);
+        }
+        
+        try {
+            if (confParser.isSectionNameInvalid(moduleName.getText()) == true) {
+                addBackupLocation.setEnabled(false);
+                addBackupLocation.setToolTipText("<html><b>Module Name is aldready taken</b> for another Path<br>Try another Name</html>");
+            } else {
+                addBackupLocation.setToolTipText(null);
+            }
+        } catch (IOException | ConfigurationException ex) {
+            Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }   
+
+    private void updateChosenBackupPath (String appendedFilePath) {
+        backupPath.setText(appendedFilePath); //Added here so that backupPath gets initialized by initComponents
+    }
+
 }

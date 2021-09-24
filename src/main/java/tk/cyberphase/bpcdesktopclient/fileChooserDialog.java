@@ -23,12 +23,23 @@ package tk.cyberphase.bpcdesktopclient;
  * @author atheesh
  */
 public class fileChooserDialog extends javax.swing.JDialog {
-
-    /**
-     * Creates new form fileChooserDialog
-     */
+    
+    rsyncDaemonConfAdd rsyncDaemonConfAddInstance;
+    
+    public void registerFileSelectionCompleteCallback(callbackInterface callbackinterface, String chosenFilePath) {
+        callbackinterface.fileChoosingComplete(chosenFilePath);
+    }
+    
     public fileChooserDialog(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);       
+        initComponents();
+        this.setLocationRelativeTo(null); //Initialize the Window at Screen Center
+        System.out.println("[WARN] This Constructor does not have the ability to implement File Browser.");
+    }    
+        
+    public fileChooserDialog(java.awt.Frame parent, boolean modal, rsyncDaemonConfAdd rsyncDaemonConfAddArgInstance) {
         super(parent, modal);
+        rsyncDaemonConfAddInstance = rsyncDaemonConfAddArgInstance;        
         initComponents();
         this.setLocationRelativeTo(null); //Initialize the Window at Screen Center
     }
@@ -80,7 +91,9 @@ public class fileChooserDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         System.out.print(evt.getActionCommand());
         if (evt.getActionCommand().equalsIgnoreCase("ApproveSelection")) {
-            System.out.println(configFileChooserElement.getSelectedFile().getAbsolutePath()); //Do as Callback
+            callbackInterface callbackinterface = rsyncDaemonConfAddInstance;
+            registerFileSelectionCompleteCallback(callbackinterface, configFileChooserElement.getSelectedFile().getAbsolutePath());
+            //System.out.println(configFileChooserElement.getSelectedFile().getAbsolutePath()); //Debugging
             this.dispose();
         } else if (evt.getActionCommand().equalsIgnoreCase("CancelSelection")) {
             this.dispose();

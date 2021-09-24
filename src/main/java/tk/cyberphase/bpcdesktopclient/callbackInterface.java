@@ -23,4 +23,5 @@ package tk.cyberphase.bpcdesktopclient;
  */
 public interface callbackInterface {
     void addedBackupPath();
+    void fileChoosingComplete(String chosenFilePath);
 }

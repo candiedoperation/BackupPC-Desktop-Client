@@ -72,6 +72,9 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
     public void addedBackupPath() {
         readDaemonrsyncConf();
     }
+    
+    @Override
+    public void fileChoosingComplete(String chosenFilePath) {}
 
     private DefaultTableModel readDaemonrsyncConf() {
         //Clear Rows
