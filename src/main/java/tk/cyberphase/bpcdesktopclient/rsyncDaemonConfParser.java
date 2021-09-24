@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -78,7 +79,7 @@ public class rsyncDaemonConfParser {
                 daemonConfigData.add(parsedConfigField);
                 currentIteratorSection = sectionName;
                 
-                System.out.println("First Non-Global Element of Configuration File: " + currentIteratorSection);
+                System.out.println("First Non-Global Section of Configuration File: " + currentIteratorSection);
             } else if (sectionName == null && currentIteratorSection == null) {
                 parsedConfigField = new iniConfigData();
                 daemonConfigData.add(parsedConfigField);
@@ -91,7 +92,7 @@ public class rsyncDaemonConfParser {
                 currentIteratorSection = sectionName;
                 currentIteratorSectionID++;
                 
-                System.out.println(String.format("Non-Global Element %d of the Configuration File: %s", (currentIteratorSectionID + 1), currentIteratorSection));  //+1 is for Human Readability. It lists length instead of index.                
+                System.out.println(String.format("Non-Global Section %d of the Configuration File: %s", (currentIteratorSectionID + 1), currentIteratorSection));  //+1 is for Human Readability. It lists length instead of index.                
             }
             
             if (section != null) {
@@ -110,6 +111,11 @@ public class rsyncDaemonConfParser {
                 }
             }
         }
+        
+        //Debugging
+        daemonConfigData.forEach(daemonConfiguration -> {
+            System.out.println(daemonConfiguration.convertToString());
+        });
 
         configReader.close();
         return daemonConfigData;
