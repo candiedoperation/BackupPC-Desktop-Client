@@ -45,7 +45,7 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
 
     @Override
     public void addedBackupPath() {
-
+        rsyncdconfigmodel.updateConfigModel(bpcConfParser);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
         configurationLabel = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
-        rsyncdConfDataTable = rsyncdConfDataTable = new javax.swing.JTable(rsyncdconfigmodel){
+        rsyncdConfDataTable = rsyncdConfDataTable = new javax.swing.JTable(){
             //Implement table cell tool tips.
             public String getToolTipText(MouseEvent e) {
                 String cellTooltip = null;
@@ -139,6 +139,7 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
         configurationLabel.setFont(new java.awt.Font("Inter Extra Bold", 0, 36)); // NOI18N
         configurationLabel.setText("Backup Locations");
 
+        rsyncdConfDataTable.setModel(rsyncdconfigmodel);
         rsyncdConfDataTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         rsyncdConfDataTable.setAutoscrolls(false);
         rsyncdConfDataTable.setFillsViewportHeight(true);
@@ -300,7 +301,7 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
 
     private void addNewPathButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNewPathButtonActionPerformed
         // TODO add your handling code here:
-        rsyncDaemonConfAdd addNewPathDialog = new rsyncDaemonConfAdd(this, true, bpcConfParser.bpcConfigData.get("rsyncd_conf_path"));
+        rsyncDaemonConfAdd addNewPathDialog = new rsyncDaemonConfAdd(this, true, bpcConfParser.bpcConfigData.get("rsyncd_conf_path"), this);
         addNewPathDialog.setVisible(true);
     }//GEN-LAST:event_addNewPathButtonActionPerformed
 

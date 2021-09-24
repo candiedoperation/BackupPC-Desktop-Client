@@ -33,10 +33,12 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class rsyncDaemonConfAdd extends javax.swing.JDialog implements callbackInterface  {
     private rsyncDaemonConfParser confParser;
     private java.awt.Frame currentParentFrame;
+    private mainInterface mainInterfaceInstance;
     
-    public rsyncDaemonConfAdd(java.awt.Frame parent, boolean modal, String daemonConfLocation) {
+    public rsyncDaemonConfAdd(java.awt.Frame parent, boolean modal, String daemonConfLocation, mainInterface parentMainInterface) {
         super(parent, modal);
         currentParentFrame = parent;
+        mainInterfaceInstance = parentMainInterface;
         initComponents();
         this.setLocationRelativeTo(null); //Initialize the Window at Screen Center        
         
@@ -45,7 +47,11 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog implements callbackI
         } catch (ConfigurationException | IOException ex) {
             Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
+    }
+
+    public rsyncDaemonConfAdd (java.awt.Frame parent, boolean modal, String daemonConfLocation) {
+        System.out.println("This Method is not yet Supported for Complete Operations!");
+    }
     
     public void registerAddedPathCallback(callbackInterface callbackinterface) {
         callbackinterface.addedBackupPath();
@@ -387,7 +393,7 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog implements callbackI
         configFieldData.put("charset", charsetSetting.getText());
 
         new rsyncDaemonConfParser().addConfigHeader(configFieldData);
-        callbackInterface callbackinterface = new mainInterface();
+        callbackInterface callbackinterface = mainInterfaceInstance;
         registerAddedPathCallback(callbackinterface);
         
         this.dispose();
