@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -59,14 +60,40 @@ public class rsyncDaemonConfParser {
 
     public List<iniConfigData> parseDaemonConfig(String daemonConfPath) throws FileNotFoundException, ConfigurationException, IOException {
         List<iniConfigData> daemonConfigData = new ArrayList<>();
+        iniConfigData parsedConfigField = new iniConfigData();        
         INIConfiguration iniConfig = new INIConfiguration();
         BufferedReader configReader = Files.newBufferedReader(Paths.get(daemonConfPath), StandardCharsets.UTF_8);
         iniConfig.read(configReader);
 
         Set<String> sectionNames = iniConfig.getSections();
+        String currentIteratorSection = null;
+        int currentIteratorSectionID = 0;
         //System.out.printf("Daemon Config Section names: %s\n", sectionNames.toString()); //Debugging
-        sectionNames.forEach(sectionName -> {
+        
+        for (String sectionName : sectionNames) {
             SubnodeConfiguration section = iniConfig.getSection(sectionName);
+            
+            if (sectionName != null && currentIteratorSection == null) {
+                System.out.println("First Non-Global Element of Configuration File: " + currentIteratorSection);
+                
+                parsedConfigField = new iniConfigData();
+                currentIteratorSection = sectionName;
+                //currentIteratorSectionID++;
+            } else if (sectionName == null && currentIteratorSection == null) {
+                System.out.println(String.format("Global Element of the Configuration File: %s", currentIteratorSection));
+                
+                parsedConfigField = new iniConfigData();
+                daemonConfigData.add(parsedConfigField);
+                currentIteratorSection = null;
+            } else if (!sectionName.equals(currentIteratorSection)) {
+                System.out.println(String.format("Global Element %d of the Configuration File: %s", currentIteratorSectionID, currentIteratorSection));
+                
+                parsedConfigField = new iniConfigData();
+                daemonConfigData.add(parsedConfigField);
+                currentIteratorSection = sectionName;
+                currentIteratorSectionID++;
+            }
+            
             if (section != null) {
                 Iterator<String> keys = section.getKeys();
 
@@ -76,14 +103,13 @@ public class rsyncDaemonConfParser {
 
                     if (value != null) {
                         //key = key.replace("..", "."); // TODO: find a better way than this hack
-                        iniConfigData parsedConfigField = new iniConfigData();
                         parsedConfigField.config_header = sectionName;
-                        parsedConfigField.config_settings.put(key, value);
-                        daemonConfigData.add(parsedConfigField);
+                        parsedConfigField.config_settings.add(new HashMap<String, String>(){{ put(key, value); }});
+                        daemonConfigData.set(currentIteratorSectionID, parsedConfigField);
                     }
                 }
             }
-        });
+        }
 
         configReader.close();
         return daemonConfigData;

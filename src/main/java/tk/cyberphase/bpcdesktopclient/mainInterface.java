@@ -17,15 +17,10 @@
  */
 package tk.cyberphase.bpcdesktopclient;
 
-//import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf; //Looks Like IntelliJ Light Theme
 import java.awt.Color;
 import java.awt.event.MouseEvent;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
@@ -35,31 +30,12 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class mainInterface extends javax.swing.JFrame implements callbackInterface {
 
     private bpcConfigParser bpcConfParser;
-    private DefaultTableModel rsyncdConfModel;
+    private rsyncdConfigModel rsyncdconfigmodel;
 
     public mainInterface() {
-        rsyncdConfModel = new DefaultTableModel(new Object[][]{},
-                new String[]{
-                    "Module Name",
-                    "Backup Path",
-                    "Comment",
-                    "Strict Mode",
-                    "Authorized Users",
-                    "Secrets File",
-                    "Allowed Hosts",
-                    "Read Only",
-                    "Allow Listing",
-                    "Charset"
-                }
-        ) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
         try {
             bpcConfParser = new bpcConfigParser();
+            rsyncdconfigmodel = new rsyncdConfigModel(bpcConfParser);
         } catch (ConfigurationException | IOException ex) {
             Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -70,79 +46,11 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
 
     @Override
     public void addedBackupPath() {
-        readDaemonrsyncConf();
+
     }
-    
+
     @Override
-    public void fileChoosingComplete(String chosenFilePath) {}
-
-    private DefaultTableModel readDaemonrsyncConf() {
-        //Clear Rows
-        try {
-            List<iniConfigData> configData = new rsyncDaemonConfParser().parseDaemonConfig(bpcConfParser.bpcConfigData.get("rsyncd_conf_path"));
-            var rowData = new String[10];
-            String currentRow = null;
-
-            for (iniConfigData dataKey : configData) {
-                if (dataKey.config_header != null) {
-
-                    if (!dataKey.config_header.equals(currentRow) && currentRow != null) {
-                        //System.out.println(Arrays.toString(rowData)); //Debugging
-                        rsyncdConfModel.addRow(rowData);
-                        Arrays.fill(rowData, null);
-                    }
-
-                    currentRow = dataKey.config_header;
-                    rowData[0] = dataKey.config_header;
-
-                    for (Entry<String, String> configCategory : dataKey.config_settings.entrySet()) {
-                        //System.out.println(configCategory.getKey());
-                        switch (configCategory.getKey()) {
-                            case "path" -> {
-                                rowData[1] = configCategory.getValue();
-                            }
-                            case "comment" -> {
-                                rowData[2] = configCategory.getValue();
-                            }
-                            case "strict modes" -> {
-                                rowData[3] = configCategory.getValue();
-                            }
-                            case "auth users" -> {
-                                rowData[4] = configCategory.getValue();
-                            }
-                            case "secrets file" -> {
-                                rowData[5] = configCategory.getValue();
-                            }
-                            case "hosts allow" -> {
-                                rowData[6] = configCategory.getValue();
-                            }
-                            case "read only" -> {
-                                rowData[7] = configCategory.getValue();
-                            }
-                            case "list" -> {
-                                rowData[8] = configCategory.getValue();
-                            }
-                            case "charset" -> {
-                                rowData[9] = configCategory.getValue();
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (rowData[0] != null) {
-                rsyncdConfModel.addRow(rowData);
-                Arrays.fill(rowData, null);
-            }
-
-        } catch (FileNotFoundException e) {
-            Logger.getLogger(rsyncDaemonConfParser.class.getName()).log(Level.SEVERE, null, e);
-        } catch (ConfigurationException | IOException ex) {
-            Logger.getLogger(rsyncDaemonConfParser.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return rsyncdConfModel;
-    }
+    public void fileChoosingComplete(String chosenFilePath) { }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -162,7 +70,7 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
         configurationLabel = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
-        rsyncdConfDataTable = rsyncdConfDataTable = new javax.swing.JTable(){
+        rsyncdConfDataTable = rsyncdConfDataTable = new javax.swing.JTable(rsyncdconfigmodel){
             //Implement table cell tool tips.
             public String getToolTipText(MouseEvent e) {
                 String cellTooltip = null;
@@ -232,12 +140,12 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
         configurationLabel.setFont(new java.awt.Font("Inter Extra Bold", 0, 36)); // NOI18N
         configurationLabel.setText("Backup Locations");
 
-        rsyncdConfDataTable.setModel(readDaemonrsyncConf());
         rsyncdConfDataTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         rsyncdConfDataTable.setAutoscrolls(false);
         rsyncdConfDataTable.setFillsViewportHeight(true);
         rsyncdConfDataTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         rsyncdConfDataTable.getTableHeader().setReorderingAllowed(false);
+
         try {
             rsyncdConfDataTable.setRowSelectionInterval(0, 0);
         } catch (Exception e) {

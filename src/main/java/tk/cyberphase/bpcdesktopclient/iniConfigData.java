@@ -18,19 +18,16 @@
 
 package tk.cyberphase.bpcdesktopclient;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-/**
- *
- * @author atheesh
- */
 public class iniConfigData {
     public String config_header;
-    public Map<String, String> config_settings;
+    public List<Map<String, String>> config_settings;
     
     public iniConfigData() {
         config_header = "";
-        config_settings = new ConcurrentHashMap<>();
+        config_settings = new ArrayList<>();
     }
 }
