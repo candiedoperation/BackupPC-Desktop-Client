@@ -138,8 +138,24 @@ public class rsyncDaemonConfParser {
         return parsedINIConfigData;
     }
     
-    public void addConfigHeader(Map<String,String> config_data) {
-        System.out.println(config_data.toString());
+    public void addConfigHeader(Map<String,String> mappedConfigHeadersData, String daemonConfPath) throws ConfigurationException, IOException {
+        INIConfiguration iniConfig = new INIConfiguration();
+        BufferedReader configReader = Files.newBufferedReader(Paths.get(daemonConfPath), StandardCharsets.UTF_8);
+        iniConfig.read(configReader);
+        
+        SubnodeConfiguration newBackupLocConfigHeader = iniConfig.getSection(mappedConfigHeadersData.get("module-name"));
+        mappedConfigHeadersData.entrySet().forEach(newBackupLocProperty -> {
+            if (!newBackupLocProperty.getKey().equals("module-name")) {
+                newBackupLocConfigHeader.addProperty(newBackupLocProperty.getKey(), mappedConfigHeadersData.get(newBackupLocProperty.getKey()));
+            }
+        });
+        
+        configReader.close();
+        
+        BufferedWriter configWriter = new BufferedWriter(new FileWriter(daemonConfPath));
+        iniConfig.write(configWriter);
+        
+        configWriter.close();        
     }
     
     public boolean isSectionNameInvalid(String configHeaderName) throws IOException, ConfigurationException {        
@@ -149,10 +165,33 @@ public class rsyncDaemonConfParser {
     public void removeConfigHeader(String configHeaderName, String daemonConfPath) throws FileNotFoundException, IOException, ConfigurationException {
         INIConfiguration iniConfig = new INIConfiguration();
         BufferedReader configReader = Files.newBufferedReader(Paths.get(daemonConfPath), StandardCharsets.UTF_8);
-        iniConfig.read(configReader);     
+        iniConfig.read(configReader);
         
-        SubnodeConfiguration deletableConfigHeader = iniConfig.getSection(configHeaderName);
-        deletableConfigHeader.clear();
+        /*SubnodeConfiguration deletableConfigHeader = iniConfig.getSection(configHeaderName); 
+        deletableConfigHeader.clear();*/
+        
+        /*
+        * getSection(configHeaderName) is vulnerable to create a new section with configHeaderName if
+        * a section with name configHeaderName does not exist in the file. It is assumed that the user
+        * will not modify the config file manually.
+        * In the latest revision, getSection() is replaced by iterating values in getSections() to overcome
+        * this vulnerability.
+        */        
+        
+        /* New Revision Code Starts */
+        
+        Set<String> iniSections = iniConfig.getSections();
+        
+        for (String iniSection : iniSections) {
+            if (iniSection != null) {
+                if (iniSection.equals(configHeaderName)) {
+                    iniConfig.clearTree(iniSection);
+                    break;
+                }                
+            }
+        }
+        
+        /* New Revision Code Ends */
         
         configReader.close();
         

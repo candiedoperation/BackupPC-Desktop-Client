@@ -34,11 +34,13 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog implements callbackI
     private rsyncDaemonConfParser confParser;
     private java.awt.Frame currentParentFrame;
     private mainInterface mainInterfaceInstance;
+    private String daemonConfPath;
     
     public rsyncDaemonConfAdd(java.awt.Frame parent, boolean modal, String daemonConfLocation, mainInterface parentMainInterface) {
         super(parent, modal);
         currentParentFrame = parent;
         mainInterfaceInstance = parentMainInterface;
+        daemonConfPath = daemonConfLocation;
         initComponents();
         this.setLocationRelativeTo(null); //Initialize the Window at Screen Center        
         
@@ -392,7 +394,12 @@ public class rsyncDaemonConfAdd extends javax.swing.JDialog implements callbackI
         configFieldData.put("list", allowListing.getText());
         configFieldData.put("charset", charsetSetting.getText());
 
-        new rsyncDaemonConfParser().addConfigHeader(configFieldData);
+        try {
+            new rsyncDaemonConfParser().addConfigHeader(configFieldData, daemonConfPath);
+        } catch (ConfigurationException | IOException ex) {
+            Logger.getLogger(rsyncDaemonConfAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         callbackInterface callbackinterface = mainInterfaceInstance;
         registerAddedPathCallback(callbackinterface);
         
