@@ -81,6 +81,7 @@ public class rsyncDaemonConfParser {
                 parsedConfigField = new iniConfigData();
                 daemonConfigData.add(parsedConfigField);
                 currentIteratorSection = sectionName;
+                currentIteratorSectionID++;
                 
                 System.out.println("First Non-Global Section of Configuration File: " + currentIteratorSection);
             } else if (sectionName == null && currentIteratorSection == null) {
@@ -104,7 +105,6 @@ public class rsyncDaemonConfParser {
                 while (keys.hasNext()) {
                     String key = keys.next();
                     String value = section.getString(key);
-
                     if (value != null) {
                         //key = key.replace("..", "."); // TODO: find a better way than this hack
                         parsedConfigField.config_header = sectionName;
