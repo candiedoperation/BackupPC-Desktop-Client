@@ -28,6 +28,6 @@ public class bpcConfigParser {
     
     public bpcConfigParser () throws ConfigurationException, IOException {
         bpcConfigData = new HashMap<>();
-        bpcConfigData.put("rsyncd_conf_path", "/home/atheesh/rsyncd.conf.bak");
+        bpcConfigData.put("rsyncd_conf_path", "/home/atheesh/rsyncd.conf");
     }
 }

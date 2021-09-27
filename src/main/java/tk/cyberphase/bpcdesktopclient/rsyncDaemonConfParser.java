@@ -19,7 +19,9 @@
 package tk.cyberphase.bpcdesktopclient;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -30,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -121,6 +124,20 @@ public class rsyncDaemonConfParser {
         return daemonConfigData;
     }
     
+    public List<iniConfigData> getNonGlobalFormattedParsedData (List<iniConfigData> parsedINIConfigData) {
+        ListIterator parsedINIConfigDataIterator = parsedINIConfigData.listIterator();
+        while (parsedINIConfigDataIterator.hasNext()) { parsedINIConfigDataIterator.next(); }
+        
+        for (iniConfigData internalParsedINIConfigData : parsedINIConfigData) {
+            if (internalParsedINIConfigData.config_header == null) {
+                parsedINIConfigData.remove(internalParsedINIConfigData);
+                break;
+            }
+        }
+        
+        return parsedINIConfigData;
+    }
+    
     public void addConfigHeader(Map<String,String> config_data) {
         System.out.println(config_data.toString());
     }
@@ -129,8 +146,20 @@ public class rsyncDaemonConfParser {
         return invalidModuleNames.stream().anyMatch(configHeaderName::equalsIgnoreCase); //INI Header Names are case-insensitive in Windows, Others may behave differently
     }
     
-    public void removeConfigHeader(String configHeaderName) {
+    public void removeConfigHeader(String configHeaderName, String daemonConfPath) throws FileNotFoundException, IOException, ConfigurationException {
+        INIConfiguration iniConfig = new INIConfiguration();
+        BufferedReader configReader = Files.newBufferedReader(Paths.get(daemonConfPath), StandardCharsets.UTF_8);
+        iniConfig.read(configReader);     
         
+        SubnodeConfiguration deletableConfigHeader = iniConfig.getSection(configHeaderName);
+        deletableConfigHeader.clear();
+        
+        configReader.close();
+        
+        BufferedWriter configWriter = new BufferedWriter(new FileWriter(daemonConfPath));
+        iniConfig.write(configWriter);
+        
+        configWriter.close();
     }
 
     public void main(String[] args) {

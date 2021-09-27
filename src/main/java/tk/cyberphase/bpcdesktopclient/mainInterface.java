@@ -49,7 +49,8 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
     }
 
     @Override
-    public void fileChoosingComplete(String chosenFilePath) { }
+    public void fileChoosingComplete(String chosenFilePath) {
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -296,7 +297,22 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
     }// </editor-fold>//GEN-END:initComponents
 
     private void removeSelectedPathButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeSelectedPathButtonActionPerformed
-        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            System.out.println(rsyncdConfDataTable.getValueAt(rsyncdConfDataTable.getSelectedRow(), 0));
+            new rsyncDaemonConfParser().removeConfigHeader((String) rsyncdConfDataTable.getValueAt(rsyncdConfDataTable.getSelectedRow(), 0), bpcConfParser.bpcConfigData.get("rsyncd_conf_path"));
+            rsyncdconfigmodel.updateConfigModel(bpcConfParser);
+
+            try {
+                rsyncdConfDataTable.setRowSelectionInterval(0, 0);
+            } catch (Exception e) {
+                updateSelectedPathButton.setEnabled(false);
+                removeSelectedPathButton.setEnabled(false);
+            }
+            
+        } catch (IOException | ConfigurationException ex) {
+            Logger.getLogger(mainInterface.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_removeSelectedPathButtonActionPerformed
 
     private void addNewPathButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNewPathButtonActionPerformed
@@ -311,8 +327,10 @@ public class mainInterface extends javax.swing.JFrame implements callbackInterfa
 
     private void rsyncdConfDataTableFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_rsyncdConfDataTableFocusGained
         // TODO add your handling code here:
-        updateSelectedPathButton.setEnabled(true);
-        removeSelectedPathButton.setEnabled(true);
+        if (rsyncdConfDataTable.getSelectedRow() > -1) { //Then some index is selected
+            updateSelectedPathButton.setEnabled(true);
+            removeSelectedPathButton.setEnabled(true);            
+        }
     }//GEN-LAST:event_rsyncdConfDataTableFocusGained
 
     private void rsyncdConfDataTableFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_rsyncdConfDataTableFocusLost

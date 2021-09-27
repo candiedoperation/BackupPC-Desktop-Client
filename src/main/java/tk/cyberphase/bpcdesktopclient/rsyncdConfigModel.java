@@ -36,6 +36,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class rsyncdConfigModel extends AbstractTableModel {
     
     private static final long serialVersionUID = 1L;
+    private rsyncDaemonConfParser rsyncdConfigParser = new rsyncDaemonConfParser();
     private String[] columnIdentifiers;
     private List<String[]> rowIdentifiers;
     
@@ -84,7 +85,7 @@ public class rsyncdConfigModel extends AbstractTableModel {
         try {
             rowIdentifiers.clear();
             
-            List<iniConfigData> configData = new rsyncDaemonConfParser().parseDaemonConfig(bpcConfParser.bpcConfigData.get("rsyncd_conf_path"));
+            List<iniConfigData> configData = rsyncdConfigParser.getNonGlobalFormattedParsedData(rsyncdConfigParser.parseDaemonConfig(bpcConfParser.bpcConfigData.get("rsyncd_conf_path")));
             ListIterator configDataIterator = configData.listIterator();
             
             while (configDataIterator.hasNext()) { configDataIterator.next(); }
